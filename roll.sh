@@ -1,7 +1,7 @@
 #!/bin/bash
 # Rick Astley in your Terminal.
 # By Serene and Justine Tunney <3
-version='1.2'
+version='1.3'
 rick='https://keroserene.net/lol'
 video="$rick/astley80.full.bz2"
 # TODO: I'll let someone with mac or windows machine send a pull request
@@ -61,6 +61,9 @@ if has? afplay; then
   # On Mac OS, if |afplay| available, pre-fetch compressed audio.
   [ -f /tmp/roll.s16 ] || obtainium $audio_raw >/tmp/roll.s16
   afplay /tmp/roll.s16 &
+elif has? pw-play; then
+  # On Linux, if |pw-play| available, stream raw sound.
+  obtainium $audio_raw | pw-play - &
 elif has? aplay; then
   # On Linux, if |aplay| available, stream raw sound.
   obtainium $audio_raw | aplay -Dplug:default -q -f S16_LE -r 8000 &
@@ -74,7 +77,7 @@ audpid=$!
 #echo -e "${yell}Fetching video..."
 # Sync FPS to reality as best as possible. Mac's freebsd version of date cannot
 # has nanoseconds so inject python. :/
-python <(cat <<EOF
+python3 <(cat <<EOF
 import sys
 import time
 fps = 25; time_per_frame = 1.0 / fps
